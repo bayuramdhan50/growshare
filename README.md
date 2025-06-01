@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GrowShare - SDG 2: Zero Hunger Platform
+
+GrowShare is a highly secure web platform focused on supporting SDG 2 (Zero Hunger) initiatives through crowdfunding and community engagement. The platform allows users to create, fund, and contribute to projects addressing food security, sustainable agriculture, and nutrition worldwide.
+
+## Key Features
+
+- **Project Crowdfunding**: Create and fund projects aligned with SDG 2 goals
+- **Secure User Authentication**: Comprehensive security with NextAuth.js
+- **Dashboard**: Track projects, donations, and contributions
+- **MySQL Database**: Secure data storage through Prisma ORM
+- **Comprehensive Security**: Protection against common web vulnerabilities
+
+## Tech Stack
+
+- **Frontend**: Next.js 15.3.3, React 19, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: MySQL
+- **Authentication**: NextAuth.js
+- **Security Features**:
+  - Content Security Policy (CSP)
+  - HTTP Security Headers
+  - CSRF Protection
+  - Input Validation with Zod
+  - Rate Limiting
+  - Password Hashing with bcryptjs
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 20.x or higher
+- MySQL database
+
+### Setup
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/bayuramdhan50/growshare.git
+cd growshare
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create a `.env` file in the root directory with the following variables:
+```
+# Database
+DATABASE_URL="mysql://username:password@localhost:3306/sdg2_zero_hunger"
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Authentication 
+NEXTAUTH_SECRET="your-very-strong-secret-key-at-least-32-chars"
+NEXTAUTH_URL="http://localhost:3000"
 
-## Learn More
+# Session
+SESSION_COOKIE_NAME="sdg2-session"
+SESSION_MAX_AGE=86400 # 24 hours
 
-To learn more about Next.js, take a look at the following resources:
+# Security
+SECURITY_HEADERS_ENABLED=true
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# CORS
+ALLOWED_ORIGINS="http://localhost:3000"
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Set up the database:
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-## Deploy on Vercel
+5. Run the development server:
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Application Structure
+
+- `/app`: Main application components and pages
+  - `/api`: API routes for authentication, projects, donations
+  - `/components`: Reusable UI components
+  - `/lib`: Utility functions, security, database access
+  - `/dashboard`: User dashboard page
+  - `/projects`: Project listing and detail pages
+  - `/signin`, `/signup`: Authentication pages
+
+## Security Features
+
+1. **HTTP Security Headers**
+   - Strict-Transport-Security
+   - Content-Security-Policy
+   - X-Content-Type-Options
+   - X-Frame-Options
+   - X-XSS-Protection
+   - Permissions-Policy
+
+2. **Authentication Security**
+   - Secure password hashing (bcryptjs)
+   - JWT-based authentication
+   - Protected routes
+   - Secure cookies
+
+3. **API Protection**
+   - Rate limiting
+   - Input validation
+   - CSRF protection
+
+4. **Database Security**
+   - Parameterized queries via Prisma ORM
+   - Input sanitization
+   - Error handling
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
