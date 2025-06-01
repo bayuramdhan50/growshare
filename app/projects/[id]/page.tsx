@@ -45,7 +45,6 @@ export default function ProjectPage() {
   const [donationMessage, setDonationMessage] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [donationSuccess, setDonationSuccess] = useState<boolean>(false);
-
   // Fetch project data
   useEffect(() => {
     async function fetchProjectData() {
@@ -53,16 +52,16 @@ export default function ProjectPage() {
       setError(null);
 
       try {
-        // In a real implementation, fetch from actual API
-        // const response = await fetch(`/api/projects/${id}`);
-        // if (!response.ok) throw new Error('Failed to load project');
-        // const data = await response.json();
-        // setProject(data.project);
-        // setDonations(data.donations);
+        const response = await fetch(`/api/projects/${id}`);
         
-        // For demo, use sample data
-        setProject(sampleProject);
-        setDonations(sampleDonations);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to load project');
+        }
+        
+        const data = await response.json();
+        setProject(data.project);
+        setDonations(data.donations);
       } catch (err) {
         console.error('Error fetching project:', err);
         setError('Failed to load project details. Please try again later.');
@@ -75,7 +74,6 @@ export default function ProjectPage() {
       fetchProjectData();
     }
   }, [id]);
-
   // Handle donation submission
   const handleDonation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,49 +86,35 @@ export default function ProjectPage() {
     setIsSubmitting(true);
     
     try {
-      // In a real implementation, send to actual API
-      // const response = await fetch('/api/donations', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     projectId: id,
-      //     amount: donationAmount,
-      //     message: donationMessage
-      //   })
-      // });
+      const response = await fetch('/api/donations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: id,
+          amount: donationAmount,
+          message: donationMessage || undefined
+        })
+      });
       
-      // if (!response.ok) throw new Error('Failed to process donation');
-      
-      // Simulate successful donation
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to process donation');
+      }
       
       setDonationSuccess(true);
       setDonationAmount(10);
       setDonationMessage('');
       
-      // Update project amount for demo
-      if (project) {
-        setProject({
-          ...project,
-          currentAmount: project.currentAmount + donationAmount
-        });
-        
-        // Add donation to list for demo
-        const newDonation: Donation = {
-          id: `donation-${Date.now()}`,
-          amount: donationAmount,
-          message: donationMessage || undefined,
-          createdAt: new Date().toISOString(),
-          user: {
-            name: session?.user?.name || 'Anonymous'
-          }
-        };
-        
-        setDonations([newDonation, ...donations]);
+      // Refresh project data to get updated amount and donations
+      const projectResponse = await fetch(`/api/projects/${id}`);
+      if (projectResponse.ok) {
+        const data = await projectResponse.json();
+        setProject(data.project);
+        setDonations(data.donations);
       }
     } catch (err) {
       console.error('Error processing donation:', err);
-      setError('Failed to process donation. Please try again.');
+      setError(`Failed to process donation: ${err instanceof Error ? err.message : 'Please try again.'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -447,75 +431,4 @@ export default function ProjectPage() {
   );
 }
 
-// Sample data for demonstration
-const sampleProject = {
-  id: '1',
-  title: 'Community Garden Initiative',
-  description: `Our Community Garden Initiative aims to transform vacant lots in urban food deserts into productive gardens that provide fresh produce for local residents.
 
-Food deserts are areas where residents have limited access to affordable and nutritious food, contributing to higher rates of diet-related health problems like obesity and diabetes.
-
-This project will:
-
-1. Convert three vacant lots in underserved neighborhoods into community gardens
-2. Install water-efficient irrigation systems
-3. Provide gardening tools and seeds to community members
-4. Offer workshops on sustainable gardening practices and nutrition
-5. Create a system for distributing harvested produce to local residents
-
-By creating these community gardens, we aim to:
-- Increase access to fresh produce for at least 300 families
-- Reduce food insecurity in the target neighborhoods by 15%
-- Provide educational opportunities about nutrition and sustainable agriculture
-- Build community connections and pride through shared gardening activities
-- Beautify neglected spaces and improve environmental conditions
-
-Your support will directly contribute to building healthier communities and addressing hunger at the local level.`,
-  goal: 10000,
-  currentAmount: 7000,
-  image: 'https://source.unsplash.com/random/1200x800/?garden,community',
-  createdAt: '2025-04-15T10:30:00Z',
-  userId: 'user1',
-  user: {
-    name: 'Maria Garcia',
-    id: 'user1'
-  }
-};
-
-const sampleDonations = [
-  {
-    id: 'donation1',
-    amount: 500,
-    message: 'This project is exactly what our neighborhood needs. Keep up the great work!',
-    createdAt: '2025-05-28T15:32:00Z',
-    user: {
-      name: 'John Smith'
-    }
-  },
-  {
-    id: 'donation2',
-    amount: 100,
-    message: 'Happy to support sustainable food initiatives in our community.',
-    createdAt: '2025-05-26T09:15:00Z',
-    user: {
-      name: 'Sarah Johnson'
-    }
-  },
-  {
-    id: 'donation3',
-    amount: 250,
-    createdAt: '2025-05-24T14:30:00Z',
-    user: {
-      name: 'Michael Wong'
-    }
-  },
-  {
-    id: 'donation4',
-    amount: 1000,
-    message: 'Excited to see this garden grow! Please let me know if you need volunteers.',
-    createdAt: '2025-05-20T11:45:00Z',
-    user: {
-      name: 'Emily Rodriguez'
-    }
-  }
-];

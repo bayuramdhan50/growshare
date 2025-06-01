@@ -34,7 +34,6 @@ export default function ProjectsPage() {
     { id: 'technology', name: 'Technology' },
     { id: 'community', name: 'Community' }
   ];
-
   // Fetch projects from API
   useEffect(() => {
     async function fetchProjects() {
@@ -42,9 +41,28 @@ export default function ProjectsPage() {
       setError(null);
 
       try {
-        // In a real implementation, you would call your actual API endpoint
-        // and include filters in the request
-        const response = await fetch('/api/projects');
+        // Build query parameters based on filters
+        const queryParams = new URLSearchParams();
+        
+        if (filters.sortBy === 'newest') {
+          queryParams.append('sort', 'createdAt:desc');
+        } else if (filters.sortBy === 'oldest') {
+          queryParams.append('sort', 'createdAt:asc');
+        } else if (filters.sortBy === 'goal-high') {
+          queryParams.append('sort', 'goal:desc');
+        } else if (filters.sortBy === 'goal-low') {
+          queryParams.append('sort', 'goal:asc');
+        } else if (filters.sortBy === 'progress') {
+          queryParams.append('sort', 'currentAmount:desc');
+        }
+        
+        // In a production app, we would also filter by category
+        // if (filters.category !== 'all') {
+        //   queryParams.append('category', filters.category);
+        // }
+        
+        // Call the real API endpoint
+        const response = await fetch(`/api/projects?${queryParams.toString()}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch projects');
@@ -55,9 +73,6 @@ export default function ProjectsPage() {
       } catch (err) {
         console.error('Error fetching projects:', err);
         setError('Failed to load projects. Please try again later.');
-        
-        // For demo purposes, set sample projects if API fails
-        setProjects(sampleProjects);
       } finally {
         setIsLoading(false);
       }
@@ -250,60 +265,4 @@ function ProjectCard({ project }: { project: Project }) {
   );
 }
 
-// Sample projects data for demonstration
-const sampleProjects: Project[] = [
-  {
-    id: '1',
-    title: 'Community Garden Initiative',
-    description: 'Building sustainable community gardens in urban food deserts to provide fresh produce to local residents.',
-    goal: 10000,
-    currentAmount: 7000,
-    image: 'https://source.unsplash.com/random/800x600/?garden,community',
-    createdAt: '2025-04-15T10:30:00Z'
-  },
-  {
-    id: '2',
-    title: 'School Nutrition Program',
-    description: 'Providing nutritious meals and education to children in schools located in disadvantaged communities.',
-    goal: 15000,
-    currentAmount: 9500,
-    image: 'https://source.unsplash.com/random/800x600/?school,food',
-    createdAt: '2025-05-03T14:45:00Z'
-  },
-  {
-    id: '3',
-    title: 'Smart Irrigation System',
-    description: 'Deploying water-efficient irrigation technology to drought-prone agricultural regions to improve crop yields.',
-    goal: 25000,
-    currentAmount: 22500,
-    image: 'https://source.unsplash.com/random/800x600/?irrigation,farm',
-    createdAt: '2025-05-10T09:15:00Z'
-  },
-  {
-    id: '4',
-    title: 'Food Waste Reduction Initiative',
-    description: 'Creating a network for distributing surplus food from restaurants and supermarkets to homeless shelters.',
-    goal: 8000,
-    currentAmount: 3200,
-    image: 'https://source.unsplash.com/random/800x600/?food,waste',
-    createdAt: '2025-05-22T11:20:00Z'
-  },
-  {
-    id: '5',
-    title: 'Sustainable Farming Workshop',
-    description: 'Teaching sustainable farming techniques to rural communities to improve crop yields and reduce environmental impact.',
-    goal: 12000,
-    currentAmount: 5400,
-    image: 'https://source.unsplash.com/random/800x600/?farming,education',
-    createdAt: '2025-05-18T16:10:00Z'
-  },
-  {
-    id: '6',
-    title: 'Mobile Food Delivery for Elderly',
-    description: 'Providing meal delivery service for elderly people who cannot leave their homes due to health issues.',
-    goal: 18000,
-    currentAmount: 12600,
-    image: 'https://source.unsplash.com/random/800x600/?elderly,food',
-    createdAt: '2025-05-25T13:40:00Z'
-  }
-];
+

@@ -63,25 +63,22 @@ export default function CreateProjectPage() {
     validationSchema,
     onSubmit: async (values) => {
       setIsSubmitting(true);
-      setError(null);
-
-      try {
-        // In a real implementation, call your API
-        // const response = await fetch('/api/projects', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(values)
-        // });
+      setError(null);      try {
+        const response = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: values.title,
+            description: values.description,
+            goal: Number(values.goal),
+            image: values.imageUrl || undefined
+          })
+        });
         
-        // if (!response.ok) {
-        //   const errorData = await response.json();
-        //   throw new Error(errorData.error || 'Failed to create project');
-        // }
-        
-        // const data = await response.json();
-        
-        // For demo purposes, simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to create project');
+        }
         
         // Redirect to projects page on success
         router.push('/projects');

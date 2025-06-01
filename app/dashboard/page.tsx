@@ -50,7 +50,6 @@ export default function DashboardPage() {
       router.push('/signin?callbackUrl=/dashboard');
     }
   }, [status, router]);
-
   // Fetch user data
   useEffect(() => {
     async function fetchUserData() {
@@ -60,21 +59,40 @@ export default function DashboardPage() {
       setError(null);
       
       try {
-        // In a real implementation, fetch from your API
-        // const [projectsRes, donationsRes, contributionsRes] = await Promise.all([
-        //   fetch('/api/user/projects'),
-        //   fetch('/api/user/donations'),
-        //   fetch('/api/user/contributions')
-        // ]);
+        const [projectsRes, donationsRes, contributionsRes] = await Promise.all([
+          fetch('/api/user/projects'),
+          fetch('/api/user/donations'),
+          fetch('/api/user/contributions')
+        ]);
         
-        // const projectsData = await projectsRes.json();
-        // const donationsData = await donationsRes.json();
-        // const contributionsData = await contributionsRes.json();
+        let projectsData = [];
+        let donationsData = [];
+        let contributionsData = [];
         
-        // For demo, use sample data
-        setUserProjects(sampleUserProjects);
-        setUserDonations(sampleUserDonations);
-        setUserContributions(sampleUserContributions);
+        if (projectsRes.ok) {
+          const data = await projectsRes.json();
+          projectsData = data.projects;
+        } else {
+          throw new Error('Failed to fetch projects');
+        }
+        
+        if (donationsRes.ok) {
+          const data = await donationsRes.json();
+          donationsData = data.donations;
+        } else {
+          throw new Error('Failed to fetch donations');
+        }
+        
+        if (contributionsRes.ok) {
+          const data = await contributionsRes.json();
+          contributionsData = data.contributions;
+        } else {
+          throw new Error('Failed to fetch contributions');
+        }
+        
+        setUserProjects(projectsData);
+        setUserDonations(donationsData);
+        setUserContributions(contributionsData);
       } catch (err) {
         console.error('Error fetching user data:', err);
         setError('Failed to load your data. Please try again later.');
@@ -611,72 +629,4 @@ export default function DashboardPage() {
   );
 }
 
-// Sample data for demonstration
-const sampleUserProjects: Project[] = [
-  {
-    id: '1',
-    title: 'Community Garden Initiative',
-    goal: 10000,
-    currentAmount: 7000,
-    image: 'https://source.unsplash.com/random/800x600/?garden,community',
-    createdAt: '2025-04-15T10:30:00Z'
-  },
-  {
-    id: '2',
-    title: 'School Nutrition Program',
-    goal: 15000,
-    currentAmount: 3500,
-    image: 'https://source.unsplash.com/random/800x600/?school,food',
-    createdAt: '2025-05-03T14:45:00Z'
-  }
-];
 
-const sampleUserDonations: Donation[] = [
-  {
-    id: 'donate1',
-    amount: 100,
-    projectId: '3',
-    projectTitle: 'Smart Irrigation System',
-    createdAt: '2025-05-20T09:15:00Z'
-  },
-  {
-    id: 'donate2',
-    amount: 50,
-    projectId: '4',
-    projectTitle: 'Food Waste Reduction Initiative',
-    createdAt: '2025-05-10T16:30:00Z'
-  },
-  {
-    id: 'donate3',
-    amount: 75,
-    projectId: '5',
-    projectTitle: 'Sustainable Farming Workshop',
-    createdAt: '2025-04-28T11:45:00Z'
-  },
-  {
-    id: 'donate4',
-    amount: 200,
-    projectId: '6',
-    projectTitle: 'Mobile Food Delivery for Elderly',
-    createdAt: '2025-04-15T14:20:00Z'
-  }
-];
-
-const sampleUserContributions: Contribution[] = [
-  {
-    id: 'contrib1',
-    description: 'Volunteered 10 hours to help set up the community garden',
-    type: 'VOLUNTEER',
-    projectId: '1',
-    projectTitle: 'Community Garden Initiative',
-    createdAt: '2025-05-15T16:00:00Z'
-  },
-  {
-    id: 'contrib2',
-    description: 'Shared knowledge about sustainable gardening practices',
-    type: 'KNOWLEDGE',
-    projectId: '1',
-    projectTitle: 'Community Garden Initiative',
-    createdAt: '2025-05-05T10:30:00Z'
-  }
-];
