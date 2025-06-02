@@ -56,11 +56,6 @@ export default function ProjectsPage() {
           queryParams.append('sort', 'currentAmount:desc');
         }
         
-        // In a production app, we would also filter by category
-        // if (filters.category !== 'all') {
-        //   queryParams.append('category', filters.category);
-        // }
-        
         // Call the real API endpoint
         const response = await fetch(`/api/projects?${queryParams.toString()}`);
         
@@ -92,7 +87,7 @@ export default function ProjectsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-dark">
           Projects Fighting Hunger
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -101,16 +96,44 @@ export default function ProjectsPage() {
         </p>
       </div>
 
+      {/* Header image with SDG2 badge */}
+      <div className="relative rounded-2xl overflow-hidden mb-12 shadow-lg">
+        <div className="h-64 lg:h-80 relative">
+          <Image
+            src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1600&h=500&q=80"
+            alt="Sustainable farming"
+            fill
+            style={{ objectFit: 'cover' }}
+            className="brightness-[0.85]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent"></div>
+        </div>
+        <div className="absolute top-1/2 left-12 transform -translate-y-1/2 text-white max-w-xl">
+          <div className="flex items-center mb-4">
+            <div className="bg-white rounded-full h-14 w-14 flex items-center justify-center mr-4">
+              <div className="text-primary font-bold text-xl">SDG2</div>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-1">Zero Hunger</h2>
+              <p className="text-sm opacity-90">Sustainable Development Goal 2</p>
+            </div>
+          </div>
+          <p className="hidden md:block text-white/90 text-lg font-light">
+            Join us in the global effort to end hunger, improve nutrition, and promote sustainable agriculture.
+          </p>
+        </div>
+      </div>
+
       {/* Filters section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
         <div className="flex flex-wrap items-center gap-2">
           {categories.map(category => (
             <button
               key={category.id}
               onClick={() => handleFilterChange('category', category.id)}
-              className={`px-4 py-2 text-sm rounded-full transition-colors ${
+              className={`px-4 py-2 text-sm rounded-full transition-all ${
                 filters.category === category.id
-                  ? 'bg-green-600 text-white'
+                  ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-sm'
                   : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
@@ -122,7 +145,7 @@ export default function ProjectsPage() {
           <select
             value={filters.sortBy}
             onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-            className="px-4 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="px-4 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="newest">Newest First</option>
             <option value="oldest">Oldest First</option>
@@ -135,10 +158,10 @@ export default function ProjectsPage() {
 
       {/* Create project button (if authenticated) */}
       {session && (
-        <div className="mb-8">
+        <div className="mb-10">
           <Link
             href="/projects/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="btn-primary inline-flex items-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
@@ -150,14 +173,14 @@ export default function ProjectsPage() {
 
       {/* Loading and error states */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-gray-300 border-t-green-600"></div>
-          <p className="mt-4 text-gray-600">Loading projects...</p>
+        <div className="text-center py-20">
+          <div className="inline-block animate-spin rounded-full h-10 w-10 border-4 border-gray-300 border-t-primary"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading projects...</p>
         </div>
       )}
 
       {error && !isLoading && (
-        <div className="bg-red-50 border-l-4 border-red-400 p-4 my-8">
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 my-8 rounded-md">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -182,8 +205,11 @@ export default function ProjectsPage() {
 
       {/* No projects found */}
       {!isLoading && !error && projects.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-600 mb-4 text-xl">No projects found</div>
+        <div className="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <div className="text-gray-600 mb-4 text-xl font-medium">No projects found</div>
           <p className="text-gray-500">Try adjusting your filters or check back later for new projects.</p>
         </div>
       )}
@@ -206,7 +232,7 @@ function ProjectCard({ project }: { project: Project }) {
   };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md transition-shadow hover:shadow-lg">
+    <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100 flex flex-col">
       {/* Project image */}
       <div className="h-48 relative overflow-hidden">
         {project.image ? (
@@ -215,37 +241,37 @@ function ProjectCard({ project }: { project: Project }) {
             alt={project.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover"
+            className="object-cover hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-r from-green-400 to-blue-500 flex items-center justify-center">
-            <span className="text-white font-bold text-xl">{project.title.charAt(0)}</span>
+          <div className="w-full h-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+            <span className="text-white font-bold text-2xl">{project.title.charAt(0)}</span>
           </div>
         )}
-        <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div className="absolute inset-0 bg-black bg-opacity-10 hover:bg-opacity-0 transition-opacity duration-300"></div>
       </div>
       
       {/* Project content */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">{project.title}</h3>
-        <p className="text-gray-600 mb-4 line-clamp-3">{project.description}</p>
+      <div className="p-6 flex flex-col flex-grow">
+        <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2 hover:text-primary transition-colors duration-200">{project.title}</h3>
+        <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">{project.description}</p>
         
         {/* Progress bar */}
         <div className="mb-4">
           <div className="w-full bg-gray-200 rounded-full h-2.5">
             <div 
-              className="bg-green-600 h-2.5 rounded-full" 
+              className="bg-gradient-to-r from-primary to-primary-dark h-2.5 rounded-full" 
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
           <div className="flex justify-between text-sm mt-2">
             <span className="text-gray-600">{formatCurrency(project.currentAmount)} raised</span>
-            <span className="text-gray-600">{formatCurrency(project.goal)} goal</span>
+            <span className="text-gray-600">{progressPercentage}% of {formatCurrency(project.goal)}</span>
           </div>
         </div>
         
         {/* Date and View button */}
-        <div className="flex items-center justify-between pt-2">
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
           <div className="text-xs text-gray-500">
             {new Date(project.createdAt).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -255,7 +281,7 @@ function ProjectCard({ project }: { project: Project }) {
           </div>
           <Link 
             href={`/projects/${project.id}`}
-            className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 transition-colors"
+            className="btn-primary-sm"
           >
             View Project
           </Link>
